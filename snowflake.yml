@@ -1,0 +1,9 @@
+definition_version: 1
+streamlit:
+  name: streamlit_rajat_test_1
+  query_warehouse: LL_STG_WH
+  main_file: streamlit_app.py
+  env_file: env_det.yml
+  database: LL_PROD_RAW_ZONE
+  schema: PUBLIC
+  

@@ -1,0 +1,19 @@
+snowflake:
+  sf_user: MIS_USER
+  sf_password: Devops@mis_user2024
+  sf_account: qg94313.ap-south-1.aws
+  sf_warehouse: LL_STG_WH
+  sf_prod_database: LL_PROD_RAW_ZONE
+  sf_stg_database: LL_STG_RAW_ZONE
+  sf_schema: PUBLIC
+
+dependencies:
+  python:
+    - pandas
+    - snowflake-connector-python
+    - streamlit
+    - datetime
+    - time
+    - numpy
+    - yaml
+    - snowpark 

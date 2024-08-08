@@ -1,0 +1,67 @@
+name: Deploy App via snowcli
+
+on:
+  workflow_dispatch:
+    inputs:
+      snowflake_account:
+        description: 'Snowflake Account'
+        required: true
+      snowflake_user:
+        description: 'Snowflake User'
+        required: true
+      snowflake_password:
+        description: 'Snowflake Password'
+        required: true
+      snowflake_role:
+        description: 'Snowflake Role'
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.8
+          cache: "pip"
+
+      - name: Install snowcli
+        run: pip install snowflake-cli-labs~=2.5.0
+
+      - name: Install yq
+        run: sudo snap install yq
+
+      - name: Set environment variables
+        run: |
+          export DATABASE=$(yq -e eval '.streamlit.database' snowflake.yml)
+          export SCHEMA=$(yq -e eval '.streamlit.schema' snowflake.yml)
+          echo "DATABASE=$DATABASE" >> $GITHUB_ENV
+          echo "SCHEMA=$SCHEMA" >> $GITHUB_ENV
+
+      - name: Create snowcli config
+        env:
+          SNOWFLAKE_ACCOUNT: ${{ github.event.inputs.snowflake_account }}
+          SNOWFLAKE_USER: ${{ github.event.inputs.snowflake_user }}
+          SNOWFLAKE_PASSWORD: ${{ github.event.inputs.snowflake_password }}
+          SNOWFLAKE_ROLE: ${{ github.event.inputs.snowflake_role }}
+        run: |
+          mkdir -p ~/.snowflake
+          cat << EOF > ~/.snowflake/config.toml
+          [connections.default]
+          account = "$SNOWFLAKE_ACCOUNT"
+          user = "$SNOWFLAKE_USER"
+          password = "$SNOWFLAKE_PASSWORD"
+          connection_timeout = 600
+          database = "$DATABASE"
+          schema = "$SCHEMA"
+          role = "$SNOWFLAKE_ROLE"
+          EOF
+          chmod 0600 ~/.snowflake/config.toml
+
+      - name: Deploy the streamlit app
+        shell: bash
+        run: snow streamlit deploy --debug --replace >> $GITHUB_STEP_SUMMARY

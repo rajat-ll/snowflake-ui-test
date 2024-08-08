@@ -1,0 +1,10 @@
+[tool.ruff]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes errors
+    "I001", # isort errors
+    "B",    # flake8-bugbear errors
+]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true

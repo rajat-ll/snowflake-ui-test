@@ -1,0 +1,14 @@
+﻿tables,team
+FLAT_RATES,"supply, admin"
+IFA_CATEGORY,"supply, admin"
+INV_CASH_TRANSACTION,"demand, admin"
+INV_EVENT_TRANSACTION,"demand, admin"
+NDV_CAPTIVE_2024,"ds, de, admin"
+LL_REPAYMENT,"supply, admin, de"
+RAZORPAY_REPAYMENT,"supply, admin, ds"
+COMMISSION_PAYOUT_TRAIL,"supply, admin,ds"
+NDV,"ds, de, admin"
+ST_COMMISSION_PAYOUT_TRAIL,test
+ST_FLAT_RATES,test
+ST_IFA_CATEGORY,test
+ST_INV_CASH_TRANSACTION,test
