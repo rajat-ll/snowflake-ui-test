@@ -33,8 +33,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Install snowcli
-        run: pip install snowflake-cli-labs~=2.5.0
+      - name: Install Snowflake Python Connector
+        run: pip install snowflake-connector-python
 
       - name: Install yq
         run: sudo snap install yq
@@ -73,9 +73,32 @@ jobs:
           SNOWFLAKE_PASSWORD: ${{ github.event.inputs.snowflake_password }}
           SNOWFLAKE_ROLE: ${{ github.event.inputs.snowflake_role }}
         run: |
-          snowflake -a $SNOWFLAKE_ACCOUNT -u $SNOWFLAKE_USER -r $SNOWFLAKE_ROLE -d $DATABASE -s $SCHEMA -p $SNOWFLAKE_PASSWORD --connection-name default connection test
-          snowflake -c default sql -q "CREATE STAGE IF NOT EXISTS my_app_stage;"
-          snowflake -c default upload -s my_app_stage -p . --overwrite
+          python - <<EOF
+          import snowflake.connector
+          import os
+
+          # Connect to Snowflake
+          ctx = snowflake.connector.connect(
+              user=os.getenv('SNOWFLAKE_USER'),
+              password=os.getenv('SNOWFLAKE_PASSWORD'),
+              account=os.getenv('SNOWFLAKE_ACCOUNT'),
+              role=os.getenv('SNOWFLAKE_ROLE'),
+              database=os.getenv('DATABASE'),
+              schema=os.getenv('SCHEMA')
+          )
+          cs = ctx.cursor()
+          try:
+              # Create stage if not exists
+              cs.execute("CREATE STAGE IF NOT EXISTS my_app_stage;")
+              
+              # Upload files to stage
+              files_to_upload = ["streamlit_app.py", "login_page.py", "data_edit_ui_page.py", "functions.py", "login_creds.csv", "table_dept_mapping.csv", "env_det.yml", "snowflake.yml", "requirements.txt"]
+              for file in files_to_upload:
+                  cs.execute(f"PUT file://{file} @my_app_stage AUTO_COMPRESS=TRUE;")
+          finally:
+              cs.close()
+              ctx.close()
+          EOF
 
       - name: Create app directory and copy all necessary files
         run: |
