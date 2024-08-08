@@ -7,7 +7,7 @@ from snowflake.snowpark.context import get_active_session
 session = get_active_session()
 
 # Write directly to the app
-st.title("Example Streamlit App :balloon:")
+st.title("Intro ")
 
 # query = "SELECT * FROM LL_PROD_RAW_ZONE.PUBLIC.EXTRA_TABLES;"
 # df = pd.DataFrame(session.sql(query).collect())
