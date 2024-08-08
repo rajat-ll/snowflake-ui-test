@@ -15,8 +15,8 @@ def download_files_from_stage():
         password=st.secrets["snowflake_password"],
         account=st.secrets["snowflake_account"],
         role=st.secrets["snowflake_role"],
-        database="LL_PROD_RAW_ZONE",  # Use the database specified in your configuration
-        schema="PUBLIC"  # Use the schema specified in your configuration
+        database="LL_PROD_RAW_ZONE",  
+        schema="PUBLIC"  
     )
     cs = ctx.cursor()
     files = ["login_creds.csv", "table_dept_mapping.csv", "env_det.yml", "snowflake.yml"]
