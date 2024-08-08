@@ -33,8 +33,10 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Install Snowflake Python Connector
-        run: pip install snowflake-connector-python
+      - name: Install SnowCLI
+        run: |
+          pip install snowflake-cli-labs~=2.5.0
+          echo 'export PATH="$HOME/.local/bin:$PATH"' >> $GITHUB_ENV
 
       - name: Install yq
         run: sudo snap install yq
@@ -109,4 +111,4 @@ jobs:
         shell: bash
         run: |
           cd ~/app
-          snow streamlit deploy --debug --replace >> $GITHUB_STEP_SUMMARY
+          ~/.local/bin/snow streamlit deploy --debug --replace >> $GITHUB_STEP_SUMMARY
