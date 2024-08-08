@@ -30,6 +30,9 @@ jobs:
           python-version: 3.8
           cache: "pip"
 
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
       - name: Install snowcli
         run: pip install snowflake-cli-labs~=2.5.0
 
