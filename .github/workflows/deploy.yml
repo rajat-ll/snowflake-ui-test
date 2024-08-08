@@ -37,10 +37,9 @@ jobs:
         run: |
           pip install snowflake-cli-labs~=2.5.0
           echo 'export PATH="$HOME/.local/bin:$PATH"' >> $GITHUB_ENV
-          echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 
       - name: Verify SnowCLI installation
-        run: echo $PATH
+        run: ~/.local/bin/snow --version
 
       - name: Install yq
         run: sudo snap install yq
@@ -115,4 +114,4 @@ jobs:
         shell: bash
         run: |
           cd ~/app
-          snow streamlit deploy --debug --replace >> $GITHUB_STEP_SUMMARY
+          ~/.local/bin/snow streamlit deploy --debug --replace >> $GITHUB_STEP_SUMMARY

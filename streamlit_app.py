@@ -5,13 +5,14 @@ from datetime import datetime
 import streamlit as st
 import time
 from snowflake.connector.pandas_tools import write_pandas
+import os
 
 def download_files_from_stage():
     ctx = snowflake.connector.connect(
-        user=st.secrets["snowflake_user"],
-        password=st.secrets["snowflake_password"],
-        account=st.secrets["snowflake_account"],
-        role=st.secrets["snowflake_role"],
+        user=os.getenv("SNOWFLAKE_USER"),
+        password=os.getenv("SNOWFLAKE_PASSWORD"),
+        account=os.getenv("SNOWFLAKE_ACCOUNT"),
+        role=os.getenv("SNOWFLAKE_ROLE"),
         database="LL_PROD_RAW_ZONE",
         schema="PUBLIC"
     )
@@ -19,12 +20,24 @@ def download_files_from_stage():
     files = ["login_creds.csv", "table_dept_mapping.csv", "env_det.yml", "snowflake.yml", "requirements.txt", "login_page.py", "data_edit_ui_page.py", "functions.py", "streamlit_app.py"]
     for file in files:
         cs.execute(f"GET @my_app_stage/{file} file://{file}")
+        if os.path.exists(file):
+            print(f"Downloaded {file} successfully")
+        else:
+            print(f"Failed to download {file}")
     cs.close()
     ctx.close()
 
 def main():
     download_files_from_stage()
 
+    # Verify that the files are downloaded before importing
+    required_files = ["login_page.py", "data_edit_ui_page.py", "functions.py"]
+    for file in required_files:
+        if not os.path.exists(file):
+            st.error(f"Required file {file} is missing. Please check the Snowflake stage.")
+            return
+
+    # Now import the modules
     import login_page
     import data_edit_ui_page
 
