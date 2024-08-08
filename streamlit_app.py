@@ -5,9 +5,9 @@ from datetime import datetime
 import streamlit as st
 import time
 from snowflake.connector.pandas_tools import write_pandas
+import data_edit_ui_page
 
 import login_page
-import data_edit_ui_page
 
 def main():
     if 'current_page' not in st.session_state:
