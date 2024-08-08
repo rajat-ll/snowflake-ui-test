@@ -5,41 +5,49 @@ from datetime import datetime
 import streamlit as st
 import time
 from snowflake.connector.pandas_tools import write_pandas
+from snowflake.snowpark import Session
+from snowflake.snowpark.context import get_active_session
 import os
+import importlib.util
 
 def download_files_from_stage():
-    ctx = snowflake.connector.connect(
-        user=os.getenv("SNOWFLAKE_USER"),
-        password=os.getenv("SNOWFLAKE_PASSWORD"),
-        account=os.getenv("SNOWFLAKE_ACCOUNT"),
-        role=os.getenv("SNOWFLAKE_ROLE"),
-        database="LL_PROD_RAW_ZONE",
-        schema="PUBLIC"
-    )
-    cs = ctx.cursor()
+    session = get_active_session()
+    target_directory = "downloaded_files"
+    os.makedirs(target_directory, exist_ok=True)
+
     files = ["login_creds.csv", "table_dept_mapping.csv", "env_det.yml", "snowflake.yml", "requirements.txt", "login_page.py", "data_edit_ui_page.py", "functions.py", "streamlit_app.py"]
     for file in files:
-        cs.execute(f"GET @my_app_stage/{file} file://{file}")
-        if os.path.exists(file):
-            print(f"Downloaded {file} successfully")
+        local_path = os.path.join(target_directory, file)
+        session.file.get(f"@my_app_stage/{file}", f"file://{local_path}")
+        if os.path.isfile(local_path):
+            print(f"Downloaded {file} successfully to {local_path}")
         else:
-            print(f"Failed to download {file}")
-    cs.close()
-    ctx.close()
+            print(f"Failed to download {file} to {local_path}")
+
+def import_module_from_file(module_name, file_path):
+    spec = importlib.util.spec_from_file_location(module_name, file_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 def main():
     download_files_from_stage()
 
-    # Verify that the files are downloaded before importing
+    target_directory = "downloaded_files"
     required_files = ["login_page.py", "data_edit_ui_page.py", "functions.py"]
+    
     for file in required_files:
-        if not os.path.exists(file):
+        full_path = os.path.join(target_directory, file)
+        if not os.path.isfile(full_path):
+            print(f"Required file {file} is missing. Full path checked: {full_path}")
             st.error(f"Required file {file} is missing. Please check the Snowflake stage.")
             return
+        else:
+            print(f"Required file {file} exists at {full_path}")
 
-    # Now import the modules
-    import login_page
-    import data_edit_ui_page
+    # Import modules from downloaded files
+    login_page = import_module_from_file('login_page', os.path.join(target_directory, 'login_page.py'))
+    data_edit_ui_page = import_module_from_file('data_edit_ui_page', os.path.join(target_directory, 'data_edit_ui_page.py'))
 
     if 'current_page' not in st.session_state:
         st.session_state.current_page = 'login'
