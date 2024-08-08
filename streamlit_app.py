@@ -5,11 +5,28 @@ from datetime import datetime
 import streamlit as st
 import time
 from snowflake.connector.pandas_tools import write_pandas
-import data_edit_ui_page
 
 import login_page
+import data_edit_ui_page
+
+def download_files_from_stage():
+    ctx = snowflake.connector.connect(
+        user=st.secrets["snowflake_user"],
+        password=st.secrets["snowflake_password"],
+        account=st.secrets["snowflake_account"],
+        warehouse=st.secrets["snowflake_warehouse"],
+        database=st.secrets["snowflake_database"],
+        schema=st.secrets["snowflake_schema"],
+    )
+    cs = ctx.cursor()
+    files = ["login_creds.csv", "table_dept_mapping.csv", "env_det.yml", "snowflake.yml"]
+    for file in files:
+        cs.execute(f"GET @my_app_stage/{file} file://{file}")
+    cs.close()
+    ctx.close()
 
 def main():
+    download_files_from_stage()
     if 'current_page' not in st.session_state:
         st.session_state.current_page = 'login'
 

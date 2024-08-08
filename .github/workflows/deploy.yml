@@ -66,6 +66,17 @@ jobs:
           EOF
           chmod 0600 ~/.snowflake/config.toml
 
+      - name: Create Snowflake stage and upload files
+        env:
+          SNOWFLAKE_ACCOUNT: ${{ github.event.inputs.snowflake_account }}
+          SNOWFLAKE_USER: ${{ github.event.inputs.snowflake_user }}
+          SNOWFLAKE_PASSWORD: ${{ github.event.inputs.snowflake_password }}
+          SNOWFLAKE_ROLE: ${{ github.event.inputs.snowflake_role }}
+        run: |
+          snowflake -a $SNOWFLAKE_ACCOUNT -u $SNOWFLAKE_USER -r $SNOWFLAKE_ROLE -d $DATABASE -s $SCHEMA -p $SNOWFLAKE_PASSWORD --connection-name default connection test
+          snowflake -c default sql -q "CREATE STAGE IF NOT EXISTS my_app_stage;"
+          snowflake -c default upload -s my_app_stage -p . --overwrite
+
       - name: Create app directory and copy all necessary files
         run: |
           mkdir -p ~/app
