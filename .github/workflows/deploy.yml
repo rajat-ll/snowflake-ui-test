@@ -36,7 +36,11 @@ jobs:
       - name: Install SnowCLI
         run: |
           pip install snowflake-cli-labs~=2.5.0
+          export PATH="$HOME/.local/bin:$PATH"
           echo 'export PATH="$HOME/.local/bin:$PATH"' >> $GITHUB_ENV
+
+      - name: Verify SnowCLI installation
+        run: ~/.local/bin/snow --version
 
       - name: Install yq
         run: sudo snap install yq
