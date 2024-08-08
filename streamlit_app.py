@@ -1,21 +1,22 @@
-# Import python packages
-import streamlit as st
-from snowflake.snowpark.context import get_active_session
 import pandas as pd
-from snowflake.snowpark.context import get_active_session
+import numpy as np
+import snowflake.connector
+from datetime import datetime
+import streamlit as st
+import time
+from snowflake.connector.pandas_tools import write_pandas
 
-session = get_active_session()
+import login_page
+import data_edit_ui_page
 
-# Write directly to the app
-st.title("Intro of POC ")
+def main():
+    if 'current_page' not in st.session_state:
+        st.session_state.current_page = 'login'
 
-# query = "SELECT * FROM LL_PROD_RAW_ZONE.PUBLIC.EXTRA_TABLES;"
-# df = pd.DataFrame(session.sql(query).collect())
-# st.write(df)
+    if st.session_state.current_page == 'login':
+        login_page.login()
+    elif st.session_state.current_page == 'editui':
+        data_edit_ui_page.edit_ui()
 
-st.write("Hello World I am Rajat Tiwari from India....Developing a automation of streamlit deployment")
-
-
-# dept_tables = pd.read_csv('table_dept_mapping.csv')
-# st.write(dept_tables)
-
+if __name__ == "__main__":
+    main()
