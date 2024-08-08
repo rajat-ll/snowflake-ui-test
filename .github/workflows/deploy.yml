@@ -66,6 +66,11 @@ jobs:
           EOF
           chmod 0600 ~/.snowflake/config.toml
 
+      - name: Copy all necessary files
+        run: |
+          mkdir -p ~/app
+          cp -r . ~/app
+
       - name: Deploy the streamlit app
         shell: bash
-        run: snow streamlit deploy --debug --replace >> $GITHUB_STEP_SUMMARY
+        run: snow streamlit deploy --path ~/app --debug --replace >> $GITHUB_STEP_SUMMARY

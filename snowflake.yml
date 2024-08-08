@@ -6,7 +6,5 @@ streamlit:
   env_file: env_det.yml
   database: LL_PROD_RAW_ZONE
   schema: PUBLIC
-  files:
-    - data_edit_ui_page.py
-    - functions.py
-    - login_page.py
+  
+  
