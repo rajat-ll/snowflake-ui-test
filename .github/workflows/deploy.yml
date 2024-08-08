@@ -69,8 +69,7 @@ jobs:
       - name: Create app directory and copy all necessary files
         run: |
           mkdir -p ~/app
-          cp streamlit_app.py login_page.py data_edit_ui_page.py functions.py ~/app/
-          cp login_creds.csv table_dept_mapping.csv env_det.yml snowflake.yml requirements.txt ~/app/
+          cp -r . ~/app
 
       - name: Deploy the streamlit app
         shell: bash
