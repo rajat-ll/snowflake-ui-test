@@ -38,6 +38,16 @@ def push_first():
         print(f"Error executing Git commands: {e}")
         exit(1)
 
+def get_workflow_id(repo_owner, repo_name, workflow_name, headers):
+    url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/actions/workflows"
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        workflows = response.json()["workflows"]
+        for workflow in workflows:
+            if workflow["name"] == workflow_name:
+                return workflow["id"]
+    return None
+
 def trigger_workflow():
     # Load environment variables from .env file
     load_dotenv()
@@ -57,13 +67,20 @@ def trigger_workflow():
     # GitHub repository details
     REPO_OWNER = "rajat-ll"
     REPO_NAME = "snowflake-ui-test"
+    WORKFLOW_NAME = "Deploy App via snowcli"
 
-    # Trigger the GitHub Actions workflow dispatch event
-    url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/actions/workflows/deploy.yml/dispatches"
+    # Get workflow ID
     headers = {
         "Accept": "application/vnd.github.v3+json",
         "Authorization": f"token {GITHUB_TOKEN}"
     }
+    workflow_id = get_workflow_id(REPO_OWNER, REPO_NAME, WORKFLOW_NAME, headers)
+    if not workflow_id:
+        print("Workflow not found. Please check the workflow name and its existence in the repository.")
+        exit(1)
+
+    # Trigger the GitHub Actions workflow dispatch event
+    url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/actions/workflows/{workflow_id}/dispatches"
     data = {
         "ref": "main",
         "inputs": {
