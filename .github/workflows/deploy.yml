@@ -108,7 +108,7 @@ jobs:
               ctx.close()
           EOF
 
-      - name: Upload files to the Snowflake stage
+      - name: Upload all files to the Snowflake stage
         env:
           SNOWFLAKE_ACCOUNT: ${{ github.event.inputs.snowflake_account }}
           SNOWFLAKE_USER: ${{ github.event.inputs.snowflake_user }}
@@ -130,7 +130,7 @@ jobs:
           )
           cs = ctx.cursor()
           try:
-              # Upload files to stage
+              # Upload all necessary files to stage
               files_to_upload = ["streamlit_app.py", "login_page.py", "data_edit_ui_page.py", "functions.py", "login_creds.csv", "table_dept_mapping.csv", "env_det.yml", "snowflake.yml", "requirements.txt"]
               for file in files_to_upload:
                   cs.execute(f"PUT file://{file} @snowflake_ui_test AUTO_COMPRESS=TRUE")
