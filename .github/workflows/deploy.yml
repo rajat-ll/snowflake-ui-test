@@ -142,4 +142,4 @@ jobs:
       - name: Deploy the Streamlit app
         shell: bash
         run: |
-          snow streamlit deploy --stage snowflake_ui_test --name STREAMLIT_RAJAT_TEST_1 --debug --replace >> $GITHUB_STEP_SUMMARY
+          snow streamlit deploy --name STREAMLIT_RAJAT_TEST_1 --debug --replace >> $GITHUB_STEP_SUMMARY
