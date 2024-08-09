@@ -1,25 +1,6 @@
 import pandas as pd
-import numpy as np
-import snowflake.connector
-from datetime import datetime
 import streamlit as st
-import time
-from snowflake.connector.pandas_tools import write_pandas
-
-from snowflake.snowpark import Session
 from snowflake.snowpark.context import get_active_session
-
-import yaml
-
-with open("env_det.yml", 'r') as stream:
-    config = yaml.safe_load(stream)
-
-user = config['snowflake']['sf_user']
-password = config['snowflake']['sf_password']
-account = config['snowflake']['sf_account']
-warehouse = config['snowflake']['sf_warehouse']
-database = config['snowflake']['sf_prod_database']
-schema = config['snowflake']['sf_schema']
 
 def st_read_from_snowflake(query):
     session = get_active_session()
@@ -30,13 +11,13 @@ def st_execute_query_on_snowflake(query):
     session = get_active_session()
     try:
         session.sql(query).collect()
-    except snowflake.connector.errors.ProgrammingError as e:
+    except Exception as e:
         st.error(f"An error occurred during the requested operation: \n{e}")
 
 def generate_update_query(row, table_name, primary_key, dataset):
     pk_value = row[primary_key]
     set_clauses = []
-    
+
     dtype_mappings = {
         'object': 'VARCHAR(16777216)',
         'int64': 'NUMBER(38,0)',
@@ -44,7 +25,7 @@ def generate_update_query(row, table_name, primary_key, dataset):
         'datetime64[ns]': 'TIMESTAMP_LTZ(9)',
         'bool': 'BOOLEAN'
     }
-    
+
     for col in dataset.columns:
         if col == primary_key:
             continue
@@ -66,7 +47,7 @@ def generate_update_query(row, table_name, primary_key, dataset):
         else:
             set_clause = f"{col} = {set_value}::{sql_type}"
         set_clauses.append(set_clause)
-    
+
     set_clause = ", ".join(set_clauses)
     update_query = f'''
     UPDATE {table_name} SET {set_clause} WHERE {primary_key} = {pk_value};
@@ -76,7 +57,7 @@ def generate_update_query(row, table_name, primary_key, dataset):
 def generate_insert_query(row, table_name, dataset):
     columns = []
     values = []
-    
+
     dtype_mappings = {
         'object': 'VARCHAR(16777216)',
         'int64': 'NUMBER(38,0)',
@@ -84,7 +65,7 @@ def generate_insert_query(row, table_name, dataset):
         'datetime64[ns]': 'TIMESTAMP_LTZ(9)',
         'bool': 'BOOLEAN'
     }
-    
+
     for col in dataset.columns:
         col_data_type = dataset[col].dtype
         sql_type = dtype_mappings.get(str(col_data_type), 'VARCHAR(16777216)')
@@ -104,7 +85,7 @@ def generate_insert_query(row, table_name, dataset):
             values.append(f"{value}")
         else:
             values.append(f"{value}::{sql_type}")
-    
+
     columns_str = ", ".join(columns)
     values_str = ", ".join(values)
     insert_query = f'''
