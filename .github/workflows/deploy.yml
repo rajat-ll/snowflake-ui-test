@@ -97,18 +97,18 @@ jobs:
               # Create stage if not exists
               cs.execute("CREATE STAGE IF NOT EXISTS snowflake_ui_test;")
               
-              # Remove existing files from stage
-              cs.execute("LIST @snowflake_ui_test")
+              # Remove existing files from the folder in the stage
+              cs.execute("LIST @snowflake_ui_test/STREAMLIT_RAJAT_TEST_1")
               files = cs.fetchall()
               for file in files:
-                  cs.execute(f"REMOVE @snowflake_ui_test/{file[0]}")
+                  cs.execute(f"REMOVE @snowflake_ui_test/STREAMLIT_RAJAT_TEST_1/{file[0]}")
               cs.execute("COMMIT")
           finally:
               cs.close()
               ctx.close()
           EOF
 
-      - name: Upload all files to the Snowflake stage
+      - name: Upload all files to the Snowflake stage folder
         env:
           SNOWFLAKE_ACCOUNT: ${{ github.event.inputs.snowflake_account }}
           SNOWFLAKE_USER: ${{ github.event.inputs.snowflake_user }}
@@ -146,10 +146,14 @@ jobs:
                   "requirements.txt"
               ]
 
-              # Upload each file to the Snowflake stage
+              # Upload each file to the Snowflake stage folder
               for file in files_to_upload:
                   file_path = os.path.join(base_dir, file)
-                  cs.execute(f"PUT file://{file_path} @snowflake_ui_test AUTO_COMPRESS=TRUE")
+                  if os.path.exists(file_path):
+                      print(f"Uploading {file_path}")
+                      cs.execute(f"PUT file://{file_path} @snowflake_ui_test/STREAMLIT_RAJAT_TEST_1/{file} AUTO_COMPRESS=TRUE")
+                  else:
+                      print(f"File not found: {file_path}")
 
           finally:
               cs.close()
