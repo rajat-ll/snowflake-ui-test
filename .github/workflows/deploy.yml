@@ -130,10 +130,27 @@ jobs:
           )
           cs = ctx.cursor()
           try:
-              # Upload all necessary files to stage
-              files_to_upload = ["streamlit_app.py", "login_page.py", "data_edit_ui_page.py", "functions.py", "login_creds.csv", "table_dept_mapping.csv", "env_det.yml", "snowflake.yml", "requirements.txt"]
+              # Define the base directory where the files are located
+              base_dir = os.getcwd()
+
+              # List of files to upload
+              files_to_upload = [
+                  "streamlit_app.py",
+                  "login_page.py",
+                  "data_edit_ui_page.py",
+                  "functions.py",
+                  "login_creds.csv",
+                  "table_dept_mapping.csv",
+                  "env_det.yml",
+                  "snowflake.yml",
+                  "requirements.txt"
+              ]
+
+              # Upload each file to the Snowflake stage
               for file in files_to_upload:
-                  cs.execute(f"PUT file://{file} @snowflake_ui_test AUTO_COMPRESS=TRUE")
+                  file_path = os.path.join(base_dir, file)
+                  cs.execute(f"PUT file://{file_path} @snowflake_ui_test AUTO_COMPRESS=TRUE")
+
           finally:
               cs.close()
               ctx.close()
