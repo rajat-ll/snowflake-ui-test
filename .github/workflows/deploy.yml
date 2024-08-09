@@ -1,4 +1,4 @@
-name: Deploy App via snowcli
+name: Deploy App via SnowCLI
 
 on:
   workflow_dispatch:
@@ -52,7 +52,7 @@ jobs:
           echo "DATABASE=$DATABASE" >> $GITHUB_ENV
           echo "SCHEMA=$SCHEMA" >> $GITHUB_ENV
 
-      - name: Create snowcli config
+      - name: Create SnowCLI config
         env:
           SNOWFLAKE_ACCOUNT: ${{ github.event.inputs.snowflake_account }}
           SNOWFLAKE_USER: ${{ github.event.inputs.snowflake_user }}
@@ -72,7 +72,7 @@ jobs:
           EOF
           chmod 0600 ~/.snowflake/config.toml
 
-      - name: Delete existing files from the Snowflake stage
+      - name: Create Snowflake stage and delete existing files
         env:
           SNOWFLAKE_ACCOUNT: ${{ github.event.inputs.snowflake_account }}
           SNOWFLAKE_USER: ${{ github.event.inputs.snowflake_user }}
@@ -94,11 +94,14 @@ jobs:
           )
           cs = ctx.cursor()
           try:
-              # List and delete existing files
-              cs.execute("LIST @my_app_stage")
+              # Create stage if not exists
+              cs.execute("CREATE STAGE IF NOT EXISTS snowflake_ui_test;")
+              
+              # Remove existing files from stage
+              cs.execute("LIST @snowflake_ui_test")
               files = cs.fetchall()
               for file in files:
-                  cs.execute(f"REMOVE @my_app_stage/{file[0]}")
+                  cs.execute(f"REMOVE @snowflake_ui_test/{file[0]}")
               cs.execute("COMMIT")
           finally:
               cs.close()
@@ -130,7 +133,7 @@ jobs:
               # Upload files to stage
               files_to_upload = ["streamlit_app.py", "login_page.py", "data_edit_ui_page.py", "functions.py", "login_creds.csv", "table_dept_mapping.csv", "env_det.yml", "snowflake.yml", "requirements.txt"]
               for file in files_to_upload:
-                  cs.execute(f"PUT file://{file} @my_app_stage AUTO_COMPRESS=TRUE")
+                  cs.execute(f"PUT file://{file} @snowflake_ui_test AUTO_COMPRESS=TRUE")
           finally:
               cs.close()
               ctx.close()
@@ -139,4 +142,4 @@ jobs:
       - name: Deploy the Streamlit app
         shell: bash
         run: |
-          snow streamlit deploy --debug --replace >> $GITHUB_STEP_SUMMARY
+          snow streamlit deploy --stage snowflake_ui_test --name STREAMLIT_RAJAT_TEST_1 --debug --replace >> $GITHUB_STEP_SUMMARY
