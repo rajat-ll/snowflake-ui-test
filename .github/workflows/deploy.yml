@@ -95,7 +95,7 @@ jobs:
           cs = ctx.cursor()
           try:
               # Clean up the existing files in the directory
-              cs.execute("REMOVE @snowflake_ui_test/STREAMLIT_RAJAT_TEST_1/*")
+              cs.execute("REMOVE @LL_PROD_RAW_ZONE.PUBLIC.snowflake_ui_test/STREAMLIT_RAJAT_TEST_1/*")
               cs.execute("COMMIT")
           finally:
               cs.close()
@@ -127,10 +127,6 @@ jobs:
               # Define the base directory where the files are located
               base_dir = os.getcwd()
 
-              # Debugging - list all files in the current directory
-              print("Current working directory:", os.getcwd())
-              print("Files in the directory:", os.listdir(os.getcwd()))
-
               # List of files to upload
               files_to_upload = [
                   "streamlit_app.py",
@@ -149,7 +145,8 @@ jobs:
                   file_path = os.path.join(base_dir, file)
                   if os.path.exists(file_path):
                       print(f"Uploading {file_path}")
-                      cs.execute(f"PUT file://{file_path} @snowflake_ui_test/STREAMLIT_RAJAT_TEST_1/{file} AUTO_COMPRESS=FALSE")
+                      result = cs.execute(f"PUT file://{file_path} @LL_PROD_RAW_ZONE.PUBLIC.snowflake_ui_test/STREAMLIT_RAJAT_TEST_1/{file} AUTO_COMPRESS=FALSE OVERWRITE=TRUE")
+                      print(f"Result of uploading {file}: {result}")
                   else:
                       print(f"File not found: {file_path}")
 
