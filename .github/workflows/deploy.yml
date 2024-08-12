@@ -72,37 +72,7 @@ jobs:
           EOF
           chmod 0600 ~/.snowflake/config.toml
 
-      - name: Clean up Snowflake stage directory
-        env:
-          SNOWFLAKE_ACCOUNT: ${{ github.event.inputs.snowflake_account }}
-          SNOWFLAKE_USER: ${{ github.event.inputs.snowflake_user }}
-          SNOWFLAKE_PASSWORD: ${{ github.event.inputs.snowflake_password }}
-          SNOWFLAKE_ROLE: ${{ github.event.inputs.snowflake_role }}
-        run: |
-          python - <<EOF
-          import snowflake.connector
-          import os
-
-          # Connect to Snowflake
-          ctx = snowflake.connector.connect(
-              user=os.getenv('SNOWFLAKE_USER'),
-              password=os.getenv('SNOWFLAKE_PASSWORD'),
-              account=os.getenv('SNOWFLAKE_ACCOUNT'),
-              role=os.getenv('SNOWFLAKE_ROLE'),
-              database=os.getenv('DATABASE'),
-              schema=os.getenv('SCHEMA')
-          )
-          cs = ctx.cursor()
-          try:
-              # Clean up the existing files in the directory
-              cs.execute("REMOVE @LL_PROD_RAW_ZONE.PUBLIC.snowflake_ui_test/STREAMLIT_RAJAT_TEST_1/*")
-              cs.execute("COMMIT")
-          finally:
-              cs.close()
-              ctx.close()
-          EOF
-
-      - name: Upload all files to the Snowflake stage directory
+      - name: Upload all files directly to the Snowflake stage
         env:
           SNOWFLAKE_ACCOUNT: ${{ github.event.inputs.snowflake_account }}
           SNOWFLAKE_USER: ${{ github.event.inputs.snowflake_user }}
@@ -127,6 +97,10 @@ jobs:
               # Define the base directory where the files are located
               base_dir = os.getcwd()
 
+              # Debugging - list all files in the current directory
+              print("Current working directory:", os.getcwd())
+              print("Files in the directory:", os.listdir(os.getcwd()))
+
               # List of files to upload
               files_to_upload = [
                   "streamlit_app.py",
@@ -140,13 +114,12 @@ jobs:
                   "requirements.txt"
               ]
 
-              # Upload each file to the Snowflake stage directory without compression
+              # Upload each file to the Snowflake stage directly
               for file in files_to_upload:
                   file_path = os.path.join(base_dir, file)
                   if os.path.exists(file_path):
                       print(f"Uploading {file_path}")
-                      result = cs.execute(f"PUT file://{file_path} @LL_PROD_RAW_ZONE.PUBLIC.snowflake_ui_test/STREAMLIT_RAJAT_TEST_1/{file} AUTO_COMPRESS=FALSE OVERWRITE=TRUE")
-                      print(f"Result of uploading {file}: {result}")
+                      cs.execute(f"PUT file://{file_path} @LL_PROD_RAW_ZONE.PUBLIC.snowflake_ui_test AUTO_COMPRESS=FALSE OVERWRITE=TRUE")
                   else:
                       print(f"File not found: {file_path}")
 
