@@ -72,7 +72,7 @@ jobs:
           EOF
           chmod 0600 ~/.snowflake/config.toml
 
-      - name: Clean up Snowflake stage
+      - name: Clean up Snowflake stage directory
         env:
           SNOWFLAKE_ACCOUNT: ${{ github.event.inputs.snowflake_account }}
           SNOWFLAKE_USER: ${{ github.event.inputs.snowflake_user }}
@@ -94,15 +94,15 @@ jobs:
           )
           cs = ctx.cursor()
           try:
-              # Clean up the existing stage
-              cs.execute("REMOVE @snowflake_ui_test/STREAMLIT_RAJAT_TEST_1")
+              # Clean up the existing files in the specific directory
+              cs.execute("REMOVE @snowflake_ui_test/STREAMLIT_RAJAT_TEST_1/*")
               cs.execute("COMMIT")
           finally:
               cs.close()
               ctx.close()
           EOF
 
-      - name: Upload all files to the Snowflake stage folder
+      - name: Upload all files to the Snowflake stage directory
         env:
           SNOWFLAKE_ACCOUNT: ${{ github.event.inputs.snowflake_account }}
           SNOWFLAKE_USER: ${{ github.event.inputs.snowflake_user }}
@@ -144,12 +144,12 @@ jobs:
                   "requirements.txt"
               ]
 
-              # Upload each file to the Snowflake stage folder without compression and without subdirectory
+              # Upload each file to the Snowflake stage directory without compression
               for file in files_to_upload:
                   file_path = os.path.join(base_dir, file)
                   if os.path.exists(file_path):
                       print(f"Uploading {file_path}")
-                      result = cs.execute(f"PUT file://{file_path} @snowflake_ui_test/{file} AUTO_COMPRESS=FALSE")
+                      result = cs.execute(f"PUT file://{file_path} @snowflake_ui_test/STREAMLIT_RAJAT_TEST_1/{file} AUTO_COMPRESS=FALSE")
                       print(f"Result of uploading {file}: {result}")
                   else:
                       print(f"File not found: {file_path}")
