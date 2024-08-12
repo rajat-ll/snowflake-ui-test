@@ -133,6 +133,10 @@ jobs:
               # Define the base directory where the files are located
               base_dir = os.getcwd()
 
+              # Debugging - list all files in the current directory
+              print("Current working directory:", os.getcwd())
+              print("Files in the directory:", os.listdir(os.getcwd()))
+
               # List of files to upload
               files_to_upload = [
                   "streamlit_app.py",
@@ -151,7 +155,8 @@ jobs:
                   file_path = os.path.join(base_dir, file)
                   if os.path.exists(file_path):
                       print(f"Uploading {file_path}")
-                      cs.execute(f"PUT file://{file_path} @snowflake_ui_test/STREAMLIT_RAJAT_TEST_1/{file} AUTO_COMPRESS=TRUE")
+                      result = cs.execute(f"PUT file://{file_path} @snowflake_ui_test/STREAMLIT_RAJAT_TEST_1/{file} AUTO_COMPRESS=TRUE")
+                      print(f"Result of uploading {file}: {result}")
                   else:
                       print(f"File not found: {file_path}")
 
