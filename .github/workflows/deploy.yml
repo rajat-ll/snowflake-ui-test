@@ -102,6 +102,10 @@ jobs:
               ctx.close()
           EOF
 
+      - name: Debug - List Files in Directory Before Upload
+        run: |
+          ls -al
+
       - name: Upload all files to the Snowflake stage folder
         env:
           SNOWFLAKE_ACCOUNT: ${{ github.event.inputs.snowflake_account }}
