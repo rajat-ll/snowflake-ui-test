@@ -94,7 +94,7 @@ jobs:
           )
           cs = ctx.cursor()
           try:
-              # Clean up the existing files in the specific directory
+              # Clean up the existing files in the directory
               cs.execute("REMOVE @snowflake_ui_test/STREAMLIT_RAJAT_TEST_1/*")
               cs.execute("COMMIT")
           finally:
