@@ -102,10 +102,6 @@ jobs:
               ctx.close()
           EOF
 
-      - name: Debug - List Files in Directory Before Upload
-        run: |
-          ls -al
-
       - name: Upload all files to the Snowflake stage folder
         env:
           SNOWFLAKE_ACCOUNT: ${{ github.event.inputs.snowflake_account }}
@@ -148,12 +144,12 @@ jobs:
                   "requirements.txt"
               ]
 
-              # Upload each file to the Snowflake stage folder without compression
+              # Upload each file to the Snowflake stage folder without compression and without subdirectory
               for file in files_to_upload:
                   file_path = os.path.join(base_dir, file)
                   if os.path.exists(file_path):
                       print(f"Uploading {file_path}")
-                      result = cs.execute(f"PUT file://{file_path} @snowflake_ui_test/STREAMLIT_RAJAT_TEST_1/{file} AUTO_COMPRESS=FALSE")
+                      result = cs.execute(f"PUT file://{file_path} @snowflake_ui_test/{file} AUTO_COMPRESS=FALSE")
                       print(f"Result of uploading {file}: {result}")
                   else:
                       print(f"File not found: {file_path}")
