@@ -13,7 +13,7 @@ def login():
     if 'username' not in st.session_state:
         st.session_state.username = None
 
-    st.title("Login Page")
+    st.title("Login Page...")
 
     cols = st.columns([3, 6, 6, 3])
     with cols[1]:
