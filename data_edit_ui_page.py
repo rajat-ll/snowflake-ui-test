@@ -40,7 +40,10 @@ def edit_ui():
         st.session_state.selected_table_df = st_read_from_snowflake(f"SELECT * FROM {st.session_state.selected_tablename}")
     st.session_state.selected_table_df_original = st.session_state.selected_table_df
 
-    st.session_state.master_pk_list = st.session_state.selected_table_df_original['ID'].unique()
+    if 'ID' in st.session_state.selected_table_df_original.columns:
+        st.session_state.master_pk_list = st.session_state.selected_table_df_original['ID'].unique()
+    else:
+        st.error("The column 'ID' does not exist in the selected table.")
 
     with st.sidebar.expander("Add Filters"):
         column_options = st.session_state.selected_table_df.columns.difference(list(st.session_state.filters.keys()))
