@@ -25,7 +25,7 @@ def login():
 
     cols = st.columns([3, 4])
     with cols[1]:
-        if st.button("Login_Rajat"):
+        if st.button("Login"):
             if inputkey in login_creds.key.unique():
                 st.session_state.user = True
                 dept = login_creds.loc[login_creds['key'].isin([inputkey]), 'team']
