@@ -3,6 +3,10 @@ name: Deploy App via SnowCLI
 on:
   workflow_dispatch:
     inputs:
+      run_workflow:
+        description: 'Should the workflow run? Set to true to proceed.'
+        required: true
+        default: 'false'
       snowflake_account:
         description: 'Snowflake Account'
         required: true
@@ -18,7 +22,7 @@ on:
 
 jobs:
   deploy:
-    if: github.ref == 'refs/heads/main'
+    if: github.event.inputs.run_workflow == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -54,10 +58,10 @@ jobs:
 
       - name: Create SnowCLI config
         env:
-          SNOWFLAKE_ACCOUNT: ${{ github.event.inputs.snowflake_account }}
-          SNOWFLAKE_USER: ${{ github.event.inputs.snowflake_user }}
-          SNOWFLAKE_PASSWORD: ${{ github.event.inputs.snowflake_password }}
-          SNOWFLAKE_ROLE: ${{ github.event.inputs.snowflake_role }}
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+          SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
         run: |
           mkdir -p ~/.snowflake
           cat << EOF > ~/.snowflake/config.toml
@@ -74,10 +78,10 @@ jobs:
 
       - name: Upload all files directly to the Snowflake stage
         env:
-          SNOWFLAKE_ACCOUNT: ${{ github.event.inputs.snowflake_account }}
-          SNOWFLAKE_USER: ${{ github.event.inputs.snowflake_user }}
-          SNOWFLAKE_PASSWORD: ${{ github.event.inputs.snowflake_password }}
-          SNOWFLAKE_ROLE: ${{ github.event.inputs.snowflake_role }}
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+          SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
         run: |
           python - <<EOF
           import snowflake.connector
