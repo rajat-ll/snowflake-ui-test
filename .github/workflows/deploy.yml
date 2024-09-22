@@ -4,21 +4,21 @@ on:
   workflow_dispatch:
     inputs:
       run_workflow:
-        description: 'Should the workflow run? Set to true to proceed..'
+        description: 'Should the workflow run? Set to true to proceed.'
         required: true
         default: 'false'
-      snowflake_account:
-        description: 'Snowflake Account'
-        required: true
-      snowflake_user:
-        description: 'Snowflake User'
-        required: true
-      snowflake_password:
-        description: 'Snowflake Password'
-        required: true
-      snowflake_role:
-        description: 'Snowflake Role'
-        required: true
+      # snowflake_account:
+      #   description: 'Snowflake Account'
+      #   required: true
+      # snowflake_user:
+      #   description: 'Snowflake User'
+      #   required: true
+      # snowflake_password:
+      #   description: 'Snowflake Password'
+      #   required: true
+      # snowflake_role:
+      #   description: 'Snowflake Role'
+      #   required: true
 
 jobs:
   deploy:
