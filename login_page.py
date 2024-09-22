@@ -17,29 +17,29 @@ def login():
         st.session_state.username = None
 
     # Main title with styling
-    st.markdown("<h1 style='text-align: center; color: #2c3e50;'>Welcome to the Login Page</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; color: #2c3e50;'>Liquiloans Data Editor</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; color: #7f8c8d;'>Please login to access the dashboard</p>", unsafe_allow_html=True)
 
     # Create columns for layout
     cols = st.columns([2, 6, 6, 2])
 
-    # Username input
+    # Username input with unique key
     with cols[1]:
-        username = st.text_input("Enter Username", placeholder="Username", help="Enter your username here")
-    # Password input
+        username = st.text_input("Enter Username", placeholder="Username", help="Enter your username here", key="username_input")
+    # Password input with unique key
     with cols[2]:
-        pswrd = st.text_input("Enter Password", type="password", placeholder="Password", help="Enter your password here")
+        pswrd = st.text_input("Enter Password", type="password", placeholder="Password", help="Enter your password here", key="password_input")
 
-    # Combine username and password for authentication
+    
     inputkey = f"{username}_{pswrd}"
     st.session_state.username = username
 
-    # Create a centered button for login
+    
     cols = st.columns([3, 2, 3])
     with cols[1]:
         login_button = st.button("Login", use_container_width=True)
 
-    # Validate login when the button is clicked
+   
     if login_button:
         if inputkey in login_creds.key.unique():
             st.session_state.user = True
