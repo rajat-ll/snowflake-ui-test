@@ -1,0 +1,19 @@
+snowflake:
+  sf_user: 
+  sf_password: 
+  sf_account: 
+  sf_warehouse: 
+  sf_prod_database: 
+  sf_stg_database: 
+  sf_schema: 
+
+dependencies:
+  python:
+    - pandas
+    - snowflake-connector-python
+    - streamlit
+    - datetime
+    - time
+    - numpy
+    - yaml
+    - snowpark 

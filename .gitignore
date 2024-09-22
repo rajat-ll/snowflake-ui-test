@@ -2,3 +2,7 @@
 .env
 git_token.txt
 commit_message_history.txt
+env_det.yml
+login_creds.csv
+table_dept_mapping.csv
+snowflake.yml
