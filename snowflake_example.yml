@@ -1,0 +1,9 @@
+definition_version: 1
+streamlit:
+  name: 
+  query_warehouse: 
+  main_file: 
+  env_file: 
+  database: 
+  schema: 
+  stage: 
