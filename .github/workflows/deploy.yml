@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       run_workflow:
-        description: 'Should the workflow run? Set to true to proceed.'
+        description: 'Should the workflow run? Set to true to proceed..'
         required: true
         default: 'false'
       snowflake_account:
