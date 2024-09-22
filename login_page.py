@@ -20,42 +20,44 @@ def login():
     st.markdown("<h1 style='text-align: center; color: #2c3e50;'>Liquiloans Data Editor</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; color: #7f8c8d;'>Please login to access the dashboard</p>", unsafe_allow_html=True)
 
-    # Create columns for layout
-    cols = st.columns([2, 6, 6, 2])
+    # Ensure that the widget is rendered only once with unique keys
+    if not st.session_state.user:
+        # Create columns for layout
+        cols = st.columns([2, 6, 6, 2])
 
-    # Username input with unique key
-    with cols[1]:
-        username = st.text_input("Enter Username", placeholder="Username", help="Enter your username here", key="username_input")
-    # Password input with unique key
-    with cols[2]:
-        pswrd = st.text_input("Enter Password", type="password", placeholder="Password", help="Enter your password here", key="password_input")
+        # Username input with a unique key
+        with cols[1]:
+            username = st.text_input("Enter Username", placeholder="Username", help="Enter your username here", key="username_input_1")
+        # Password input with a unique key
+        with cols[2]:
+            pswrd = st.text_input("Enter Password", type="password", placeholder="Password", help="Enter your password here", key="password_input_1")
 
-    
-    inputkey = f"{username}_{pswrd}"
-    st.session_state.username = username
+        # Combine username and password for authentication
+        inputkey = f"{username}_{pswrd}"
+        st.session_state.username = username
 
-    
-    cols = st.columns([3, 2, 3])
-    with cols[1]:
-        login_button = st.button("Login", use_container_width=True)
+        # Create a centered button for login
+        cols = st.columns([3, 2, 3])
+        with cols[1]:
+            login_button = st.button("Login", use_container_width=True)
 
-   
-    if login_button:
-        if inputkey in login_creds.key.unique():
-            st.session_state.user = True
-            dept = login_creds.loc[login_creds['key'].isin([inputkey]), 'team']
-            if len(st.session_state.allowed_tables_list) == 0:
-                st.session_state.allowed_tables_list.extend(
-                    table.strip() for tables in dept_tables.loc[dept_tables['team'].str.contains(dept.values[0]), 'tables'] for table in tables.split(',')
-                )
-                st.session_state.allowed_tables_list = list(set(st.session_state.allowed_tables_list))
+        # Validate login when the button is clicked
+        if login_button:
+            if inputkey in login_creds.key.unique():
+                st.session_state.user = True
+                dept = login_creds.loc[login_creds['key'].isin([inputkey]), 'team']
+                if len(st.session_state.allowed_tables_list) == 0:
+                    st.session_state.allowed_tables_list.extend(
+                        table.strip() for tables in dept_tables.loc[dept_tables['team'].str.contains(dept.values[0]), 'tables'] for table in tables.split(',')
+                    )
+                    st.session_state.allowed_tables_list = list(set(st.session_state.allowed_tables_list))
 
-            st.success("User Validated! Redirecting...", icon="✅")
-            time.sleep(2)
-            st.session_state.current_page = 'editui'
-            st.experimental_rerun()
-        else:
-            st.error("Invalid Username or Password", icon="🚫")
+                st.success("User Validated! Redirecting...", icon="✅")
+                time.sleep(2)
+                st.session_state.current_page = 'editui'
+                st.experimental_rerun()
+            else:
+                st.error("Invalid Username or Password", icon="🚫")
 
-
+# Call the login function
 login()
