@@ -1,28 +1,10 @@
 name: Deploy App via SnowCLI
 
 on:
-  workflow_dispatch:
-    # inputs:
-    #   run_workflow:
-    #     description: 'Should the workflow run? Set to true to proceed.'
-    #     required: true
-    #     default: 'false'
-      # snowflake_account:
-      #   description: 'Snowflake Account'
-      #   required: true
-      # snowflake_user:
-      #   description: 'Snowflake User'
-      #   required: true
-      # snowflake_password:
-      #   description: 'Snowflake Password'
-      #   required: true
-      # snowflake_role:
-      #   description: 'Snowflake Role'
-      #   required: true
+  workflow_dispatch: # No inputs, workflow is triggered manually
 
 jobs:
   deploy:
-    if: github.event.inputs.run_workflow == 'true'
     runs-on: ubuntu-latest
 
     steps:
